@@ -9,25 +9,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Entry point.
- *
- * Usage:
- *   java -cp out com.trading.Main [dataDir] [startBalance] [splitDate]
- *
- * Defaults:
- *   dataDir     = ../quant/data
- *   startBalance = 10000
- *   splitDate   = 2025-06-01  (roughly 14 months in-sample, 9 months OOS)
- *
- * The split date separates:
- *   IN-SAMPLE  — period used to discover strategy parameters (not truly "clean")
- *   OOS        — period the optimizer never saw; this is the real validity test
- *
- * Note: EMA and ADX indicators are backward-looking, so there is no actual data
- * leakage in signal generation — the OOS signals only use data available at the
- * time each trade was taken.
- */
 public class Main {
 
     private static final String DEFAULT_DATA_DIR   = "../quant/data";
@@ -51,7 +32,6 @@ public class Main {
             return;
         }
 
-        // Partition into in-sample and out-of-sample
         List<Trade> inSample = all.stream()
                 .filter(t -> t.date().isBefore(splitDate))
                 .collect(Collectors.toList());
@@ -60,19 +40,22 @@ public class Main {
                 .filter(t -> !t.date().isBefore(splitDate))
                 .collect(Collectors.toList());
 
-        // Balance at the end of the in-sample period becomes OOS starting balance
         double endOfIsBalance = balance
                 + inSample.stream().mapToDouble(Trade::pnlUsd).sum();
 
-        // Write trade logs
+        // --- CSV trade logs ---
         TradeJournal.write(all,      RESULTS_DIR + "/orb_trades_full.csv");
         TradeJournal.write(inSample, RESULTS_DIR + "/orb_trades_insample.csv");
         TradeJournal.write(oos,      RESULTS_DIR + "/orb_trades_oos.csv");
-        System.out.println("Logs written to results/");
 
-        // Print all three reports
-        PerformanceMetrics.print(inSample, balance,         "IN-SAMPLE  (" + splitDate + ")");
-        PerformanceMetrics.print(oos,      endOfIsBalance,  "OUT-OF-SAMPLE  (unseen data)");
-        PerformanceMetrics.print(all,      balance,         "FULL PERIOD");
+        // --- JSON summaries (consumed by the frontend) ---
+        PerformanceMetrics.exportSummaryJson(all,      balance,        "full",          RESULTS_DIR + "/summary.json");
+        PerformanceMetrics.exportSummaryJson(inSample, balance,        "inSample",      RESULTS_DIR + "/summary_insample.json");
+        PerformanceMetrics.exportSummaryJson(oos,      endOfIsBalance, "outOfSample",   RESULTS_DIR + "/summary_oos.json");
+
+        // --- Console reports ---
+        PerformanceMetrics.print(inSample, balance,        "IN-SAMPLE  (" + splitDate + ")");
+        PerformanceMetrics.print(oos,      endOfIsBalance, "OUT-OF-SAMPLE  (unseen data)");
+        PerformanceMetrics.print(all,      balance,        "FULL PERIOD");
     }
 }
