@@ -8,115 +8,129 @@ import TradesLedger from './pages/TradesLedger'
 import Diagnostics from './pages/Diagnostics'
 import Strategy from './pages/Strategy'
 
+/* ─── Ribbon ─────────────────────────────────────────────────────────────── */
+// Trefoil-knot inspired 3D ribbon — simulates the same iridescent twisted
+// sculpture style as the Tradex reference (which uses a Blender/Cinema 4D render).
+// We layer: shadow pass → mid-color pass → bright highlight pass → specular lines.
 function RibbonSVG() {
   return (
-    <svg viewBox="0 0 520 700" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full" aria-hidden="true">
+    <svg
+      viewBox="0 0 500 520"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className="w-full h-full"
+      aria-hidden="true"
+    >
       <defs>
-        <linearGradient id="rg1" x1="0" y1="0" x2="1" y2="1" gradientUnits="objectBoundingBox">
-          <stop offset="0%"   stopColor="#4361EE" />
-          <stop offset="30%"  stopColor="#7209B7" />
-          <stop offset="65%"  stopColor="#4CC9F0" />
-          <stop offset="100%" stopColor="#00F5A0" />
+        {/* Iridescent colour stops — blue → violet → teal → green */}
+        <linearGradient id="g-blue-teal" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%"   stopColor="#3A86FF" />
+          <stop offset="40%"  stopColor="#8338EC" />
+          <stop offset="75%"  stopColor="#06D6A0" />
+          <stop offset="100%" stopColor="#4CC9F0" />
         </linearGradient>
-        <linearGradient id="rg2" x1="1" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
-          <stop offset="0%"   stopColor="#00F5A0" />
-          <stop offset="35%"  stopColor="#4CC9F0" />
-          <stop offset="70%"  stopColor="#7B2FFF" />
-          <stop offset="100%" stopColor="#4361EE" />
-        </linearGradient>
-        <linearGradient id="rg3" x1="0" y1="1" x2="1" y2="0" gradientUnits="objectBoundingBox">
-          <stop offset="0%"   stopColor="#7209B7" />
-          <stop offset="45%"  stopColor="#4CC9F0" />
-          <stop offset="100%" stopColor="#00d4ff" />
-        </linearGradient>
-        <linearGradient id="rg4" x1="0.5" y1="0" x2="0.5" y2="1" gradientUnits="objectBoundingBox">
+        <linearGradient id="g-violet-cyan" x1="1" y1="0" x2="0" y2="1">
           <stop offset="0%"   stopColor="#4CC9F0" />
-          <stop offset="55%"  stopColor="#7B2FFF" stopOpacity="0.9" />
-          <stop offset="100%" stopColor="#00F5A0" />
+          <stop offset="35%"  stopColor="#7209B7" />
+          <stop offset="70%"  stopColor="#06D6A0" />
+          <stop offset="100%" stopColor="#3A86FF" />
         </linearGradient>
-        <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
-          <feGaussianBlur in="SourceGraphic" stdDeviation="14" result="blur" />
-          <feMerge>
-            <feMergeNode in="blur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
+        <linearGradient id="g-teal-purple" x1="0" y1="1" x2="1" y2="0">
+          <stop offset="0%"   stopColor="#06D6A0" />
+          <stop offset="45%"  stopColor="#4CC9F0" />
+          <stop offset="100%" stopColor="#8338EC" />
+        </linearGradient>
+        <linearGradient id="g-deep" x1="0.5" y1="0" x2="0.5" y2="1">
+          <stop offset="0%"   stopColor="#240046" />
+          <stop offset="50%"  stopColor="#3A0CA3" />
+          <stop offset="100%" stopColor="#0a0020" />
+        </linearGradient>
+        <linearGradient id="g-gold" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%"   stopColor="#4CC9F0" />
+          <stop offset="55%"  stopColor="#06D6A0" />
+          <stop offset="100%" stopColor="#3A86FF" />
+        </linearGradient>
+
+        {/* Outer bloom glow */}
+        <filter id="bloom" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="18" result="b" />
+          <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
         </filter>
-        <filter id="softglow" x="-25%" y="-25%" width="150%" height="150%">
-          <feGaussianBlur in="SourceGraphic" stdDeviation="7" result="blur" />
-          <feMerge>
-            <feMergeNode in="blur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
+        {/* Softer inner glow */}
+        <filter id="glow2" x="-30%" y="-30%" width="160%" height="160%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="b" />
+          <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
         </filter>
       </defs>
 
-      {/* Ambient glow blobs */}
-      <ellipse cx="260" cy="360" rx="210" ry="260" fill="#7B2FFF" opacity="0.07" />
-      <ellipse cx="230" cy="340" rx="160" ry="200" fill="#4CC9F0" opacity="0.045" />
+      {/* ── Ambient halo ── */}
+      <ellipse cx="250" cy="280" rx="195" ry="210" fill="#7B2FFF" opacity="0.09" />
+      <ellipse cx="240" cy="270" rx="140" ry="155" fill="#4CC9F0" opacity="0.055" />
 
-      {/* Outer glow layer – widest, most transparent */}
-      <path
-        d="M 230 660 C 100 610 10 500 55 395 C 100 290 230 315 270 245 C 310 175 330 105 278 82 C 226 59 162 102 175 165 C 188 228 268 238 308 186 C 348 134 364 72 312 58 C 260 44 198 87 212 152 C 226 217 308 224 338 170 C 368 116 348 50 285 62"
-        stroke="url(#rg1)" strokeWidth="62" strokeLinecap="round" strokeLinejoin="round"
-        fill="none" opacity="0.45" filter="url(#glow)"
-      />
+      {/* ═══════════════════════════════════════════════
+          RIBBON A — large sweeping outer arc
+          (trefoil lobe 1: top → left → bottom-right)
+      ═══════════════════════════════════════════════ */}
+      {/* shadow */}
+      <path d="M 250 80 C 340 60 430 120 430 220 C 430 320 360 380 280 400 C 200 420 120 390 90 320 C 60 250 90 160 160 130 C 230 100 290 130 310 190 C 330 250 300 310 250 320 C 200 330 155 300 145 250"
+        stroke="#0a0020" strokeWidth="52" strokeLinecap="round" fill="none" opacity="0.7" />
+      {/* mid colour */}
+      <path d="M 250 80 C 340 60 430 120 430 220 C 430 320 360 380 280 400 C 200 420 120 390 90 320 C 60 250 90 160 160 130 C 230 100 290 130 310 190 C 330 250 300 310 250 320 C 200 330 155 300 145 250"
+        stroke="url(#g-blue-teal)" strokeWidth="40" strokeLinecap="round" fill="none" opacity="0.82" filter="url(#bloom)" />
+      {/* bright core */}
+      <path d="M 250 80 C 340 60 430 120 430 220 C 430 320 360 380 280 400 C 200 420 120 390 90 320 C 60 250 90 160 160 130 C 230 100 290 130 310 190 C 330 250 300 310 250 320 C 200 330 155 300 145 250"
+        stroke="url(#g-violet-cyan)" strokeWidth="22" strokeLinecap="round" fill="none" opacity="0.7" />
 
-      {/* Main ribbon body */}
-      <path
-        d="M 230 660 C 100 610 10 500 55 395 C 100 290 230 315 270 245 C 310 175 330 105 278 82 C 226 59 162 102 175 165 C 188 228 268 238 308 186 C 348 134 364 72 312 58 C 260 44 198 87 212 152 C 226 217 308 224 338 170 C 368 116 348 50 285 62"
-        stroke="url(#rg2)" strokeWidth="42" strokeLinecap="round" strokeLinejoin="round"
-        fill="none" opacity="0.88"
-      />
+      {/* ═══════════════════════════════════════════════
+          RIBBON B — crossing band through the center
+          (trefoil lobe 2: right-high → center-cross → bottom-left)
+      ═══════════════════════════════════════════════ */}
+      <path d="M 370 110 C 420 170 410 260 360 320 C 310 380 240 400 180 380 C 120 360 80 300 90 240 C 100 180 150 150 200 160 C 250 170 280 210 270 260 C 260 310 220 340 175 340"
+        stroke="#050015" strokeWidth="44" strokeLinecap="round" fill="none" opacity="0.65" />
+      <path d="M 370 110 C 420 170 410 260 360 320 C 310 380 240 400 180 380 C 120 360 80 300 90 240 C 100 180 150 150 200 160 C 250 170 280 210 270 260 C 260 310 220 340 175 340"
+        stroke="url(#g-teal-purple)" strokeWidth="34" strokeLinecap="round" fill="none" opacity="0.78" filter="url(#glow2)" />
+      <path d="M 370 110 C 420 170 410 260 360 320 C 310 380 240 400 180 380 C 120 360 80 300 90 240 C 100 180 150 150 200 160 C 250 170 280 210 270 260 C 260 310 220 340 175 340"
+        stroke="url(#g-gold)" strokeWidth="16" strokeLinecap="round" fill="none" opacity="0.6" />
 
-      {/* Secondary ribbon band – offset, different gradient */}
-      <path
-        d="M 270 648 C 162 592 78 484 132 384 C 186 284 308 304 340 234 C 372 164 380 94 330 74 C 280 54 218 100 232 164 C 246 228 328 232 356 180 C 384 128 392 66 342 50 C 292 34 242 76 258 140"
-        stroke="url(#rg3)" strokeWidth="30" strokeLinecap="round" strokeLinejoin="round"
-        fill="none" opacity="0.78" filter="url(#softglow)"
-      />
-      <path
-        d="M 270 648 C 162 592 78 484 132 384 C 186 284 308 304 340 234 C 372 164 380 94 330 74 C 280 54 218 100 232 164 C 246 228 328 232 356 180 C 384 128 392 66 342 50 C 292 34 242 76 258 140"
-        stroke="url(#rg4)" strokeWidth="14" strokeLinecap="round" strokeLinejoin="round"
-        fill="none" opacity="0.55"
-      />
+      {/* ═══════════════════════════════════════════════
+          RIBBON C — inner twisting loop
+          (trefoil lobe 3: center → top-left → bottom → right)
+      ═══════════════════════════════════════════════ */}
+      <path d="M 200 150 C 140 120 90 150 80 210 C 70 270 110 330 170 355 C 230 380 300 360 340 310 C 380 260 380 190 340 150 C 300 110 250 110 220 140"
+        stroke="#080018" strokeWidth="38" strokeLinecap="round" fill="none" opacity="0.6" />
+      <path d="M 200 150 C 140 120 90 150 80 210 C 70 270 110 330 170 355 C 230 380 300 360 340 310 C 380 260 380 190 340 150 C 300 110 250 110 220 140"
+        stroke="url(#g-blue-teal)" strokeWidth="28" strokeLinecap="round" fill="none" opacity="0.72" filter="url(#glow2)" />
+      <path d="M 200 150 C 140 120 90 150 80 210 C 70 270 110 330 170 355 C 230 380 300 360 340 310 C 380 260 380 190 340 150 C 300 110 250 110 220 140"
+        stroke="url(#g-violet-cyan)" strokeWidth="13" strokeLinecap="round" fill="none" opacity="0.55" />
 
-      {/* Additional lower loop for depth */}
-      <path
-        d="M 148 535 C 68 480 48 396 92 342 C 136 288 210 312 244 272"
-        stroke="url(#rg1)" strokeWidth="36" strokeLinecap="round"
-        fill="none" opacity="0.55"
-      />
-      <path
-        d="M 148 535 C 68 480 48 396 92 342 C 136 288 210 312 244 272"
-        stroke="url(#rg2)" strokeWidth="18" strokeLinecap="round"
-        fill="none" opacity="0.5"
-      />
+      {/* ── Extra small twist for complexity ── */}
+      <path d="M 255 200 C 295 180 330 200 335 240 C 340 280 315 315 280 325 C 245 335 210 315 205 280 C 200 245 220 215 250 205"
+        stroke="url(#g-teal-purple)" strokeWidth="20" strokeLinecap="round" fill="none" opacity="0.5" filter="url(#glow2)" />
+      <path d="M 255 200 C 295 180 330 200 335 240 C 340 280 315 315 280 325 C 245 335 210 315 205 280 C 200 245 220 215 250 205"
+        stroke="url(#g-gold)" strokeWidth="9" strokeLinecap="round" fill="none" opacity="0.45" />
 
-      {/* Specular highlight streaks */}
-      <path
-        d="M 215 638 C 114 582 42 482 84 386 C 112 322 172 306 218 280"
-        stroke="white" strokeWidth="3" strokeLinecap="round" fill="none" opacity="0.22"
-      />
-      <path
-        d="M 264 242 C 286 214 300 184 294 162 C 282 128 256 110 232 116"
-        stroke="white" strokeWidth="2.5" strokeLinecap="round" fill="none" opacity="0.28"
-      />
-      <path
-        d="M 322 178 C 346 146 356 112 340 88"
-        stroke="white" strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.32"
-      />
-      <path
-        d="M 258 150 C 274 124 282 96 270 76"
-        stroke="white" strokeWidth="1.8" strokeLinecap="round" fill="none" opacity="0.2"
-      />
-      <path
-        d="M 136 522 C 80 468 62 392 98 340"
-        stroke="white" strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.18"
-      />
+      {/* ── Specular highlight lines (simulates light hitting ribbon edge) ── */}
+      <path d="M 260 84 C 320 66 390 110 410 180"
+        stroke="white" strokeWidth="2.5" strokeLinecap="round" fill="none" opacity="0.25" />
+      <path d="M 418 225 C 426 290 400 350 355 385"
+        stroke="white" strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.18" />
+      <path d="M 375 115 C 408 158 415 220 390 278"
+        stroke="white" strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.2" />
+      <path d="M 95 240 C 88 290 102 340 138 368"
+        stroke="white" strokeWidth="1.8" strokeLinecap="round" fill="none" opacity="0.15" />
+      <path d="M 166 133 C 200 115 240 118 268 138"
+        stroke="white" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.2" />
+      <path d="M 207 155 C 172 128 128 142 100 178"
+        stroke="white" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.16" />
+
+      {/* ── Inner bright ring at knot centre ── */}
+      <circle cx="250" cy="255" r="18" stroke="url(#g-blue-teal)" strokeWidth="6" fill="none" opacity="0.3" filter="url(#bloom)" />
+      <circle cx="250" cy="255" r="8"  stroke="white" strokeWidth="2" fill="none" opacity="0.2" />
     </svg>
   )
 }
 
+/* ─── Landing page ───────────────────────────────────────────────────────── */
 function LandingPage() {
   const { signIn } = useData()
   const [showSignIn, setShowSignIn] = useState(false)
@@ -134,32 +148,40 @@ function LandingPage() {
     setLoading(false)
   }
 
-  function openSignIn() { setShowSignIn(true); setErr('') }
+  function openSignIn()  { setShowSignIn(true);  setErr('') }
   function closeSignIn() { setShowSignIn(false); setErr('') }
 
   return (
     <div
-      className="min-h-screen relative overflow-hidden select-none"
-      style={{ background: 'radial-gradient(ellipse at 62% 48%, #1c093e 0%, #12092a 22%, #0a0518 55%, #040210 100%)' }}
+      className="min-h-screen relative overflow-hidden"
+      style={{
+        background:
+          'radial-gradient(ellipse at 65% 45%, #1c093e 0%, #130828 22%, #0a0518 55%, #040210 100%)',
+      }}
     >
-      {/* Subtle grid */}
+      {/* Subtle dot-grid overlay */}
       <div
-        className="absolute inset-0 pointer-events-none opacity-40"
+        className="absolute inset-0 pointer-events-none"
         style={{
           backgroundImage:
-            'linear-gradient(rgba(80,30,180,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(80,30,180,0.06) 1px, transparent 1px)',
-          backgroundSize: '64px 64px',
+            'radial-gradient(circle, rgba(80,30,200,0.12) 1px, transparent 1px)',
+          backgroundSize: '40px 40px',
         }}
       />
 
-      {/* Nav */}
-      <nav className="relative z-10 flex items-center justify-between px-10 py-6">
-        <span className="text-white font-bold text-xl tracking-tighter">nova.</span>
-        <div className="flex items-center gap-10 text-[11px] font-semibold tracking-[0.18em]">
+      {/* ── Nav ── */}
+      <nav className="relative z-10 flex items-center justify-between px-6 sm:px-10 py-5 sm:py-6">
+        <span className="text-white font-bold text-lg sm:text-xl tracking-tighter select-none">
+          nova.
+        </span>
+
+        {/* Centre links — hidden on xs */}
+        <div className="hidden sm:flex items-center gap-8 md:gap-10 text-[11px] font-semibold tracking-[0.18em]">
           <button className="text-white">HOME</button>
           <button className="text-gray-500 hover:text-gray-300 transition-colors">FEATURES</button>
           <button className="text-gray-500 hover:text-gray-300 transition-colors">PRICING</button>
         </div>
+
         <button
           onClick={openSignIn}
           className="text-[11px] font-semibold tracking-[0.18em] text-gray-400 hover:text-white transition-colors"
@@ -168,80 +190,135 @@ function LandingPage() {
         </button>
       </nav>
 
-      {/* Hero layout */}
-      <div className="relative z-10 flex items-center" style={{ minHeight: 'calc(100vh - 88px)' }}>
-        {/* Ribbon — left side */}
-        <div className="absolute inset-y-0 left-0 w-[56%] flex items-center justify-start pointer-events-none">
-          <div style={{ width: 540, height: 640, marginLeft: -20 }}>
+      {/* ── Hero ── */}
+      {/*
+        Mobile  (<lg): ribbon on top, centred; text below, centred
+        Desktop (≥lg): ribbon absolute-left half; text right half
+      */}
+      <div className="relative z-10">
+        {/* Desktop absolute ribbon */}
+        <div className="hidden lg:flex absolute inset-y-0 left-0 w-[55%] items-center justify-center pointer-events-none" style={{ top: 0, bottom: 0 }}>
+          <div style={{ width: 520, height: 520 }}>
             <RibbonSVG />
           </div>
         </div>
 
-        {/* Hero text — right side */}
-        <div className="ml-auto pr-20" style={{ width: '46%', maxWidth: 460 }}>
-          <div className="inline-flex items-center gap-2 border border-[#f72585]/35 text-[#f72585] text-[10px] font-semibold tracking-[0.22em] px-4 py-1.5 rounded-full mb-7">
-            ALGORITHMIC TRADING.
+        <div
+          className="flex flex-col lg:flex-row items-center"
+          style={{ minHeight: 'calc(100vh - 76px)' }}
+        >
+          {/* Mobile ribbon — shown only below lg */}
+          <div className="lg:hidden flex justify-center w-full pt-4 pb-2 pointer-events-none">
+            <div className="w-64 h-64 sm:w-80 sm:h-80">
+              <RibbonSVG />
+            </div>
           </div>
-          <h1 className="text-[3.4rem] font-extrabold text-white leading-[1.08] mb-9" style={{ letterSpacing: '-0.02em' }}>
-            Your Edge,<br />Quantified.
-          </h1>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={openSignIn}
-              className="px-7 py-3 bg-[#f72585] hover:bg-[#d91e73] text-white text-sm font-semibold rounded-lg transition-all duration-200"
-              style={{ boxShadow: '0 0 32px rgba(247,37,133,0.35)' }}
+
+          {/* Text block */}
+          <div className="w-full lg:w-[46%] lg:ml-auto lg:pr-20 px-6 sm:px-10 pb-14 lg:pb-0 text-center lg:text-left">
+            <div className="inline-flex items-center gap-2 border border-[#f72585]/35 text-[#f72585] text-[10px] font-semibold tracking-[0.22em] px-4 py-1.5 rounded-full mb-6 sm:mb-7">
+              ALGORITHMIC TRADING.
+            </div>
+
+            <h1
+              className="font-extrabold text-white leading-[1.08] mb-8 sm:mb-9"
+              style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', letterSpacing: '-0.02em' }}
             >
-              Sign In
-            </button>
-            <button className="w-10 h-10 border border-white/15 rounded-lg flex items-center justify-center text-white/50 hover:text-white hover:border-white/30 transition-all text-base">
-              ↗
-            </button>
+              Your Edge,<br />Quantified.
+            </h1>
+
+            <div className="flex items-center gap-3 justify-center lg:justify-start">
+              <button
+                onClick={openSignIn}
+                className="px-7 py-3 bg-[#f72585] hover:bg-[#d91e73] text-white text-sm font-semibold rounded-lg transition-all duration-200"
+                style={{ boxShadow: '0 0 32px rgba(247,37,133,0.35)' }}
+              >
+                Sign In
+              </button>
+              <button className="w-10 h-10 border border-white/15 rounded-lg flex items-center justify-center text-white/50 hover:text-white hover:border-white/30 transition-all text-base">
+                ↗
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Sign In Modal */}
+      {/* ── Sign In Modal ── */}
       {showSignIn && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center"
-          style={{ background: 'rgba(4,2,12,0.82)', backdropFilter: 'blur(10px)' }}
+          className="fixed inset-0 z-50 flex items-center justify-center px-4"
+          style={{ background: 'rgba(4,2,12,0.85)', backdropFilter: 'blur(12px)' }}
           onClick={e => { if (e.target === e.currentTarget) closeSignIn() }}
         >
-          <div className="w-full max-w-sm rounded-2xl p-8 relative" style={{ background: '#0c0c0c', border: '1px solid #1f1f1f' }}>
+          <div
+            className="w-full max-w-sm rounded-2xl p-7 sm:p-8 relative"
+            style={{ background: '#0c0c0c', border: '1px solid #222' }}
+          >
             <button
               onClick={closeSignIn}
               className="absolute top-4 right-4 text-gray-600 hover:text-gray-300 text-lg leading-none"
             >
               ✕
             </button>
+
             <span className="text-white font-bold text-xl tracking-tighter block mb-7">nova.</span>
             <h2 className="text-base font-bold mb-1 text-white">Sign in</h2>
             <p className="text-xs text-gray-500 mb-6">Access your live strategy dashboard.</p>
+
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-[10px] text-gray-500 mb-1.5 uppercase tracking-[0.15em]">Email</label>
+                <label className="block text-[10px] text-gray-500 mb-1.5 uppercase tracking-[0.15em]">
+                  Email
+                </label>
                 <input
-                  type="email" value={email} onChange={e => setEmail(e.target.value)} required autoFocus
-                  className="w-full bg-[#111] border border-[#252525] rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-[#f72585] transition-colors"
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  required
+                  autoFocus
+                  placeholder="ea474@njit.edu"
+                  className="w-full bg-[#111] border border-[#2a2a2a] rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-[#f72585] transition-colors placeholder-gray-700"
                 />
               </div>
               <div>
-                <label className="block text-[10px] text-gray-500 mb-1.5 uppercase tracking-[0.15em]">Password</label>
+                <label className="block text-[10px] text-gray-500 mb-1.5 uppercase tracking-[0.15em]">
+                  Password
+                </label>
                 <input
-                  type="password" value={password} onChange={e => setPassword(e.target.value)} required
-                  className="w-full bg-[#111] border border-[#252525] rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-[#f72585] transition-colors"
+                  type="password"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  required
+                  className="w-full bg-[#111] border border-[#2a2a2a] rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-[#f72585] transition-colors"
                 />
               </div>
+
               {err && (
-                <p className="text-[#ff3d71] text-xs bg-[#ff3d71]/5 border border-[#ff3d71]/20 rounded px-3 py-2">{err}</p>
+                <p className="text-[#ff3d71] text-xs bg-[#ff3d71]/5 border border-[#ff3d71]/20 rounded px-3 py-2">
+                  {err}
+                </p>
               )}
+
               <button
-                type="submit" disabled={loading}
+                type="submit"
+                disabled={loading}
                 className="w-full py-2.5 bg-[#f72585] hover:bg-[#d91e73] text-white text-sm font-bold rounded-lg tracking-wider transition-colors disabled:opacity-50"
                 style={{ boxShadow: '0 0 20px rgba(247,37,133,0.2)' }}
               >
                 {loading ? 'SIGNING IN...' : 'SIGN IN'}
               </button>
+
+              <p className="text-center text-[10px] text-gray-600">
+                Forgot password?{' '}
+                <a
+                  href="https://supabase.com/dashboard/project/lqaodrawvtnhukgwvqci/auth/users"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-[#f72585] hover:underline"
+                >
+                  Reset via Supabase
+                </a>
+              </p>
             </form>
           </div>
         </div>
@@ -250,6 +327,7 @@ function LandingPage() {
   )
 }
 
+/* ─── Placeholder for stub routes ────────────────────────────────────────── */
 function PlaceholderPage({ title }) {
   return (
     <div className="flex items-center justify-center h-64">
@@ -261,13 +339,14 @@ function PlaceholderPage({ title }) {
   )
 }
 
+/* ─── App shell (authenticated) ─────────────────────────────────────────── */
 function AppShell() {
   const { authReady, authSession } = useData()
 
   if (!authReady) return (
     <div
       className="min-h-screen flex items-center justify-center"
-      style={{ background: 'radial-gradient(ellipse at 62% 48%, #1c093e 0%, #0a0518 55%, #040210 100%)' }}
+      style={{ background: 'radial-gradient(ellipse at 65% 45%, #1c093e 0%, #0a0518 55%, #040210 100%)' }}
     >
       <div className="w-8 h-8 border-2 border-[#f72585] border-t-transparent rounded-full animate-spin" />
     </div>
@@ -281,7 +360,7 @@ function AppShell() {
         <Sidebar />
         <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
           <TopNav />
-          <main className="flex-1 overflow-y-auto p-6">
+          <main className="flex-1 overflow-y-auto p-4 sm:p-6">
             <Routes>
               <Route path="/"            element={<Navigate to="/dashboard" replace />} />
               <Route path="/dashboard"   element={<Dashboard />} />
