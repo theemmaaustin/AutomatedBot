@@ -8,132 +8,9 @@ import TradesLedger from './pages/TradesLedger'
 import Diagnostics from './pages/Diagnostics'
 import Strategy from './pages/Strategy'
 
-/* ─── Ribbon ─────────────────────────────────────────────────────────────── */
-// Trefoil-knot inspired 3D ribbon — simulates the same iridescent twisted
-// sculpture style as the Tradex reference (which uses a Blender/Cinema 4D render).
-// We layer: shadow pass → mid-color pass → bright highlight pass → specular lines.
-function RibbonSVG() {
-  return (
-    <svg
-      viewBox="0 0 500 520"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className="w-full h-full"
-      aria-hidden="true"
-    >
-      <defs>
-        {/* Iridescent colour stops — blue → violet → teal → green */}
-        <linearGradient id="g-blue-teal" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%"   stopColor="#3A86FF" />
-          <stop offset="40%"  stopColor="#8338EC" />
-          <stop offset="75%"  stopColor="#06D6A0" />
-          <stop offset="100%" stopColor="#4CC9F0" />
-        </linearGradient>
-        <linearGradient id="g-violet-cyan" x1="1" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stopColor="#4CC9F0" />
-          <stop offset="35%"  stopColor="#7209B7" />
-          <stop offset="70%"  stopColor="#06D6A0" />
-          <stop offset="100%" stopColor="#3A86FF" />
-        </linearGradient>
-        <linearGradient id="g-teal-purple" x1="0" y1="1" x2="1" y2="0">
-          <stop offset="0%"   stopColor="#06D6A0" />
-          <stop offset="45%"  stopColor="#4CC9F0" />
-          <stop offset="100%" stopColor="#8338EC" />
-        </linearGradient>
-        <linearGradient id="g-deep" x1="0.5" y1="0" x2="0.5" y2="1">
-          <stop offset="0%"   stopColor="#240046" />
-          <stop offset="50%"  stopColor="#3A0CA3" />
-          <stop offset="100%" stopColor="#0a0020" />
-        </linearGradient>
-        <linearGradient id="g-gold" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%"   stopColor="#4CC9F0" />
-          <stop offset="55%"  stopColor="#06D6A0" />
-          <stop offset="100%" stopColor="#3A86FF" />
-        </linearGradient>
-
-        {/* Outer bloom glow */}
-        <filter id="bloom" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur in="SourceGraphic" stdDeviation="18" result="b" />
-          <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
-        </filter>
-        {/* Softer inner glow */}
-        <filter id="glow2" x="-30%" y="-30%" width="160%" height="160%">
-          <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="b" />
-          <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
-        </filter>
-      </defs>
-
-      {/* ── Ambient halo ── */}
-      <ellipse cx="250" cy="280" rx="195" ry="210" fill="#7B2FFF" opacity="0.09" />
-      <ellipse cx="240" cy="270" rx="140" ry="155" fill="#4CC9F0" opacity="0.055" />
-
-      {/* ═══════════════════════════════════════════════
-          RIBBON A — large sweeping outer arc
-          (trefoil lobe 1: top → left → bottom-right)
-      ═══════════════════════════════════════════════ */}
-      {/* shadow */}
-      <path d="M 250 80 C 340 60 430 120 430 220 C 430 320 360 380 280 400 C 200 420 120 390 90 320 C 60 250 90 160 160 130 C 230 100 290 130 310 190 C 330 250 300 310 250 320 C 200 330 155 300 145 250"
-        stroke="#0a0020" strokeWidth="52" strokeLinecap="round" fill="none" opacity="0.7" />
-      {/* mid colour */}
-      <path d="M 250 80 C 340 60 430 120 430 220 C 430 320 360 380 280 400 C 200 420 120 390 90 320 C 60 250 90 160 160 130 C 230 100 290 130 310 190 C 330 250 300 310 250 320 C 200 330 155 300 145 250"
-        stroke="url(#g-blue-teal)" strokeWidth="40" strokeLinecap="round" fill="none" opacity="0.82" filter="url(#bloom)" />
-      {/* bright core */}
-      <path d="M 250 80 C 340 60 430 120 430 220 C 430 320 360 380 280 400 C 200 420 120 390 90 320 C 60 250 90 160 160 130 C 230 100 290 130 310 190 C 330 250 300 310 250 320 C 200 330 155 300 145 250"
-        stroke="url(#g-violet-cyan)" strokeWidth="22" strokeLinecap="round" fill="none" opacity="0.7" />
-
-      {/* ═══════════════════════════════════════════════
-          RIBBON B — crossing band through the center
-          (trefoil lobe 2: right-high → center-cross → bottom-left)
-      ═══════════════════════════════════════════════ */}
-      <path d="M 370 110 C 420 170 410 260 360 320 C 310 380 240 400 180 380 C 120 360 80 300 90 240 C 100 180 150 150 200 160 C 250 170 280 210 270 260 C 260 310 220 340 175 340"
-        stroke="#050015" strokeWidth="44" strokeLinecap="round" fill="none" opacity="0.65" />
-      <path d="M 370 110 C 420 170 410 260 360 320 C 310 380 240 400 180 380 C 120 360 80 300 90 240 C 100 180 150 150 200 160 C 250 170 280 210 270 260 C 260 310 220 340 175 340"
-        stroke="url(#g-teal-purple)" strokeWidth="34" strokeLinecap="round" fill="none" opacity="0.78" filter="url(#glow2)" />
-      <path d="M 370 110 C 420 170 410 260 360 320 C 310 380 240 400 180 380 C 120 360 80 300 90 240 C 100 180 150 150 200 160 C 250 170 280 210 270 260 C 260 310 220 340 175 340"
-        stroke="url(#g-gold)" strokeWidth="16" strokeLinecap="round" fill="none" opacity="0.6" />
-
-      {/* ═══════════════════════════════════════════════
-          RIBBON C — inner twisting loop
-          (trefoil lobe 3: center → top-left → bottom → right)
-      ═══════════════════════════════════════════════ */}
-      <path d="M 200 150 C 140 120 90 150 80 210 C 70 270 110 330 170 355 C 230 380 300 360 340 310 C 380 260 380 190 340 150 C 300 110 250 110 220 140"
-        stroke="#080018" strokeWidth="38" strokeLinecap="round" fill="none" opacity="0.6" />
-      <path d="M 200 150 C 140 120 90 150 80 210 C 70 270 110 330 170 355 C 230 380 300 360 340 310 C 380 260 380 190 340 150 C 300 110 250 110 220 140"
-        stroke="url(#g-blue-teal)" strokeWidth="28" strokeLinecap="round" fill="none" opacity="0.72" filter="url(#glow2)" />
-      <path d="M 200 150 C 140 120 90 150 80 210 C 70 270 110 330 170 355 C 230 380 300 360 340 310 C 380 260 380 190 340 150 C 300 110 250 110 220 140"
-        stroke="url(#g-violet-cyan)" strokeWidth="13" strokeLinecap="round" fill="none" opacity="0.55" />
-
-      {/* ── Extra small twist for complexity ── */}
-      <path d="M 255 200 C 295 180 330 200 335 240 C 340 280 315 315 280 325 C 245 335 210 315 205 280 C 200 245 220 215 250 205"
-        stroke="url(#g-teal-purple)" strokeWidth="20" strokeLinecap="round" fill="none" opacity="0.5" filter="url(#glow2)" />
-      <path d="M 255 200 C 295 180 330 200 335 240 C 340 280 315 315 280 325 C 245 335 210 315 205 280 C 200 245 220 215 250 205"
-        stroke="url(#g-gold)" strokeWidth="9" strokeLinecap="round" fill="none" opacity="0.45" />
-
-      {/* ── Specular highlight lines (simulates light hitting ribbon edge) ── */}
-      <path d="M 260 84 C 320 66 390 110 410 180"
-        stroke="white" strokeWidth="2.5" strokeLinecap="round" fill="none" opacity="0.25" />
-      <path d="M 418 225 C 426 290 400 350 355 385"
-        stroke="white" strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.18" />
-      <path d="M 375 115 C 408 158 415 220 390 278"
-        stroke="white" strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.2" />
-      <path d="M 95 240 C 88 290 102 340 138 368"
-        stroke="white" strokeWidth="1.8" strokeLinecap="round" fill="none" opacity="0.15" />
-      <path d="M 166 133 C 200 115 240 118 268 138"
-        stroke="white" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.2" />
-      <path d="M 207 155 C 172 128 128 142 100 178"
-        stroke="white" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.16" />
-
-      {/* ── Inner bright ring at knot centre ── */}
-      <circle cx="250" cy="255" r="18" stroke="url(#g-blue-teal)" strokeWidth="6" fill="none" opacity="0.3" filter="url(#bloom)" />
-      <circle cx="250" cy="255" r="8"  stroke="white" strokeWidth="2" fill="none" opacity="0.2" />
-    </svg>
-  )
-}
-
-/* ─── Landing page ───────────────────────────────────────────────────────── */
-function LandingPage() {
+/* ─── Sign-In Modal ──────────────────────────────────────────────────────── */
+function SignInModal({ onClose }) {
   const { signIn } = useData()
-  const [showSignIn, setShowSignIn] = useState(false)
   const [email,    setEmail]    = useState('')
   const [password, setPassword] = useState('')
   const [loading,  setLoading]  = useState(false)
@@ -144,190 +21,355 @@ function LandingPage() {
     setLoading(true)
     setErr('')
     const msg = await signIn(email, password)
-    if (msg) setErr(msg)
-    setLoading(false)
+    if (msg) { setErr(msg); setLoading(false) }
   }
-
-  function openSignIn()  { setShowSignIn(true);  setErr('') }
-  function closeSignIn() { setShowSignIn(false); setErr('') }
 
   return (
     <div
-      className="min-h-screen relative overflow-hidden"
-      style={{
-        background:
-          'radial-gradient(ellipse at 65% 45%, #1c093e 0%, #130828 22%, #0a0518 55%, #040210 100%)',
-      }}
+      className="nova-modal-overlay"
+      onClick={e => { if (e.target === e.currentTarget) onClose() }}
     >
-      {/* Subtle dot-grid overlay */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          backgroundImage:
-            'radial-gradient(circle, rgba(80,30,200,0.12) 1px, transparent 1px)',
-          backgroundSize: '40px 40px',
-        }}
-      />
+      <div className="nova-modal">
+        <button className="nova-modal-close" onClick={onClose}>✕</button>
 
-      {/* ── Nav ── */}
-      <nav className="relative z-10 flex items-center justify-between px-6 sm:px-10 py-5 sm:py-6">
-        <span className="text-white font-bold text-lg sm:text-xl tracking-tighter select-none">
-          nova.
-        </span>
-
-        {/* Centre links — hidden on xs */}
-        <div className="hidden sm:flex items-center gap-8 md:gap-10 text-[11px] font-semibold tracking-[0.18em]">
-          <button className="text-white">HOME</button>
-          <button className="text-gray-500 hover:text-gray-300 transition-colors">FEATURES</button>
-          <button className="text-gray-500 hover:text-gray-300 transition-colors">PRICING</button>
+        <div className="nova-logo" style={{ marginBottom: 28, fontSize: 16 }}>
+          Nova<span>.</span>
         </div>
 
-        <button
-          onClick={openSignIn}
-          className="text-[11px] font-semibold tracking-[0.18em] text-gray-400 hover:text-white transition-colors"
-        >
-          SIGN IN
-        </button>
-      </nav>
+        <h2 style={{ fontFamily: 'Syne, sans-serif', fontSize: 22, fontWeight: 700, marginBottom: 6, color: 'var(--nwhite)' }}>
+          Sign in
+        </h2>
+        <p style={{ fontFamily: 'DM Mono, monospace', fontSize: 12, color: 'var(--muted)', marginBottom: 28, letterSpacing: '0.04em' }}>
+          Access your live strategy dashboard.
+        </p>
 
-      {/* ── Hero ── */}
-      {/*
-        Mobile  (<lg): ribbon on top, centred; text below, centred
-        Desktop (≥lg): ribbon absolute-left half; text right half
-      */}
-      <div className="relative z-10">
-        {/* Desktop absolute ribbon */}
-        <div className="hidden lg:flex absolute inset-y-0 left-0 w-[55%] items-center justify-center pointer-events-none" style={{ top: 0, bottom: 0 }}>
-          <div style={{ width: 520, height: 520 }}>
-            <RibbonSVG />
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div>
+            <label style={{ display: 'block', fontFamily: 'DM Mono, monospace', fontSize: 10, letterSpacing: '0.15em', color: 'var(--muted)', textTransform: 'uppercase', marginBottom: 8 }}>
+              Email
+            </label>
+            <input
+              type="email"
+              className="nova-input"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              required
+              autoFocus
+              placeholder="your@email.com"
+            />
           </div>
-        </div>
-
-        <div
-          className="flex flex-col lg:flex-row items-center"
-          style={{ minHeight: 'calc(100vh - 76px)' }}
-        >
-          {/* Mobile ribbon — shown only below lg */}
-          <div className="lg:hidden flex justify-center w-full pt-4 pb-2 pointer-events-none">
-            <div className="w-64 h-64 sm:w-80 sm:h-80">
-              <RibbonSVG />
-            </div>
+          <div>
+            <label style={{ display: 'block', fontFamily: 'DM Mono, monospace', fontSize: 10, letterSpacing: '0.15em', color: 'var(--muted)', textTransform: 'uppercase', marginBottom: 8 }}>
+              Password
+            </label>
+            <input
+              type="password"
+              className="nova-input"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              required
+            />
           </div>
 
-          {/* Text block */}
-          <div className="w-full lg:w-[46%] lg:ml-auto lg:pr-20 px-6 sm:px-10 pb-14 lg:pb-0 text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 border border-[#f72585]/35 text-[#f72585] text-[10px] font-semibold tracking-[0.22em] px-4 py-1.5 rounded-full mb-6 sm:mb-7">
-              ALGORITHMIC TRADING.
-            </div>
+          {err && (
+            <p style={{ fontFamily: 'DM Mono, monospace', fontSize: 12, color: '#f87171', background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.2)', borderRadius: 6, padding: '10px 14px' }}>
+              {err}
+            </p>
+          )}
 
-            <h1
-              className="font-extrabold text-white leading-[1.08] mb-8 sm:mb-9"
-              style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', letterSpacing: '-0.02em' }}
+          <button type="submit" disabled={loading} className="btn-primary" style={{ marginTop: 4 }}>
+            {loading ? 'Signing in...' : 'Sign In'}
+          </button>
+
+          <p style={{ textAlign: 'center', fontFamily: 'DM Mono, monospace', fontSize: 11, color: 'rgba(240,237,232,0.25)', marginTop: 4 }}>
+            Forgot password?{' '}
+            <a
+              href="https://supabase.com/dashboard/project/lqaodrawvtnhukgwvqci/auth/users"
+              target="_blank"
+              rel="noreferrer"
+              style={{ color: 'var(--gold)', textDecoration: 'none' }}
             >
-              Your Edge,<br />Quantified.
-            </h1>
-
-            <div className="flex items-center gap-3 justify-center lg:justify-start">
-              <button
-                onClick={openSignIn}
-                className="px-7 py-3 bg-[#f72585] hover:bg-[#d91e73] text-white text-sm font-semibold rounded-lg transition-all duration-200"
-                style={{ boxShadow: '0 0 32px rgba(247,37,133,0.35)' }}
-              >
-                Sign In
-              </button>
-              <button className="w-10 h-10 border border-white/15 rounded-lg flex items-center justify-center text-white/50 hover:text-white hover:border-white/30 transition-all text-base">
-                ↗
-              </button>
-            </div>
-          </div>
-        </div>
+              Reset via Supabase →
+            </a>
+          </p>
+        </form>
       </div>
-
-      {/* ── Sign In Modal ── */}
-      {showSignIn && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center px-4"
-          style={{ background: 'rgba(4,2,12,0.85)', backdropFilter: 'blur(12px)' }}
-          onClick={e => { if (e.target === e.currentTarget) closeSignIn() }}
-        >
-          <div
-            className="w-full max-w-sm rounded-2xl p-7 sm:p-8 relative"
-            style={{ background: '#0c0c0c', border: '1px solid #222' }}
-          >
-            <button
-              onClick={closeSignIn}
-              className="absolute top-4 right-4 text-gray-600 hover:text-gray-300 text-lg leading-none"
-            >
-              ✕
-            </button>
-
-            <span className="text-white font-bold text-xl tracking-tighter block mb-7">nova.</span>
-            <h2 className="text-base font-bold mb-1 text-white">Sign in</h2>
-            <p className="text-xs text-gray-500 mb-6">Access your live strategy dashboard.</p>
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-[10px] text-gray-500 mb-1.5 uppercase tracking-[0.15em]">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  required
-                  autoFocus
-                  placeholder="ea474@njit.edu"
-                  className="w-full bg-[#111] border border-[#2a2a2a] rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-[#f72585] transition-colors placeholder-gray-700"
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] text-gray-500 mb-1.5 uppercase tracking-[0.15em]">
-                  Password
-                </label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                  required
-                  className="w-full bg-[#111] border border-[#2a2a2a] rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-[#f72585] transition-colors"
-                />
-              </div>
-
-              {err && (
-                <p className="text-[#ff3d71] text-xs bg-[#ff3d71]/5 border border-[#ff3d71]/20 rounded px-3 py-2">
-                  {err}
-                </p>
-              )}
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-2.5 bg-[#f72585] hover:bg-[#d91e73] text-white text-sm font-bold rounded-lg tracking-wider transition-colors disabled:opacity-50"
-                style={{ boxShadow: '0 0 20px rgba(247,37,133,0.2)' }}
-              >
-                {loading ? 'SIGNING IN...' : 'SIGN IN'}
-              </button>
-
-              <p className="text-center text-[10px] text-gray-600">
-                Forgot password?{' '}
-                <a
-                  href="https://supabase.com/dashboard/project/lqaodrawvtnhukgwvqci/auth/users"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-[#f72585] hover:underline"
-                >
-                  Reset via Supabase
-                </a>
-              </p>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   )
 }
 
-/* ─── Placeholder for stub routes ────────────────────────────────────────── */
+/* ─── Landing Page ───────────────────────────────────────────────────────── */
+function LandingPage() {
+  const [showSignIn, setShowSignIn] = useState(false)
+
+  return (
+    <div className="nova-body" style={{ background: 'var(--void)', minHeight: '100vh' }}>
+
+      {/* ── NAV ── */}
+      <nav className="nova-nav">
+        <div className="nova-logo">Nova<span>.</span></div>
+        <ul className="nova-nav-links">
+          <li><a href="#">Markets</a></li>
+          <li><a href="#">Signals</a></li>
+          <li><a href="#">Community</a></li>
+          <li><a href="#">Pricing</a></li>
+        </ul>
+        <button className="nova-nav-cta" onClick={() => setShowSignIn(true)}>
+          Sign In
+        </button>
+      </nav>
+
+      {/* ── HERO ── */}
+      <section className="nova-hero">
+        <div className="blob hero-blob-1" style={{ width: 600, height: 600, background: 'rgba(181,23,90,0.28)', top: -100, right: -80 }} />
+        <div className="blob hero-blob-2" style={{ width: 400, height: 400, background: 'rgba(201,147,58,0.2)', bottom: 0, left: 100 }} />
+        <div className="blob hero-blob-3" style={{ width: 300, height: 300, background: 'rgba(26,107,90,0.22)', top: 200, right: 300 }} />
+
+        <div className="nova-hero-label">Forex Intelligence Platform</div>
+        <h1>
+          Your edge.<br />
+          Always on.
+          <span className="dim">Always clear.</span>
+        </h1>
+        <p className="nova-hero-sub">
+          SMC/ICT signals. Real-time confluence. Prop firm ready. Built for traders who don't guess.
+        </p>
+        <div className="nova-hero-actions">
+          <button className="btn-primary" onClick={() => setShowSignIn(true)}>
+            Sign In
+          </button>
+          <button className="btn-ghost">[ View Signals ]</button>
+        </div>
+      </section>
+
+      {/* ── TICKER ── */}
+      <div className="nova-ticker">
+        <div className="nova-ticker-track">
+          {[
+            { pair: 'EUR/USD', price: '1.08432', chg: '+0.12%', up: true },
+            { pair: 'GBP/USD', price: '1.26781', chg: '-0.08%', up: false },
+            { pair: 'USD/JPY', price: '149.23',  chg: '+0.31%', up: true },
+            { pair: 'XAU/USD', price: '2341.50', chg: '+0.44%', up: true },
+            { pair: 'BTC/USD', price: '67,842',  chg: '-1.2%',  up: false },
+            { pair: 'NAS100',  price: '18,234',  chg: '+0.6%',  up: true },
+            { pair: 'EUR/USD', price: '1.08432', chg: '+0.12%', up: true },
+            { pair: 'GBP/USD', price: '1.26781', chg: '-0.08%', up: false },
+            { pair: 'USD/JPY', price: '149.23',  chg: '+0.31%', up: true },
+            { pair: 'XAU/USD', price: '2341.50', chg: '+0.44%', up: true },
+            { pair: 'BTC/USD', price: '67,842',  chg: '-1.2%',  up: false },
+            { pair: 'NAS100',  price: '18,234',  chg: '+0.6%',  up: true },
+          ].map((t, i) => (
+            <div key={i} className="nova-ticker-item">
+              <span className="ticker-pair">{t.pair}</span>
+              <span className="ticker-price">{t.price}</span>
+              <span className={`ticker-change ${t.up ? 'up' : 'down'}`}>{t.chg}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── FEATURES / BENTO ── */}
+      <section className="nova-section">
+        <div className="blob" style={{ width: 500, height: 500, background: 'rgba(181,23,90,0.15)', top: -100, right: -100, filter: 'blur(100px)' }} />
+        <div className="blob" style={{ width: 400, height: 400, background: 'rgba(26,107,90,0.15)', bottom: -50, left: -50, filter: 'blur(100px)' }} />
+
+        <div className="nova-section-label">What Nova sees</div>
+        <div className="nova-section-title">
+          Signal.<br /><span className="dim">Structure.</span><br />Edge.
+        </div>
+
+        <div className="nova-bento">
+          {/* Card 1: EUR/USD price */}
+          <div className="nova-card c1">
+            <div className="card-inner-blob" style={{ width: 300, height: 300, background: 'rgba(201,147,58,0.18)', bottom: -80, right: -80 }} />
+            <div className="nova-card-tag">Live Graph · EUR/USD</div>
+            <div style={{ color: 'var(--muted)', fontFamily: 'DM Mono, monospace', fontSize: 12, marginBottom: 8 }}>Current Price</div>
+            <div className="nova-big-num">1.0843<span className="unit">usd</span></div>
+            <div className="nova-sparkline">
+              <svg viewBox="0 0 200 40" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="goldGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="rgba(201,147,58,0.3)" />
+                    <stop offset="100%" stopColor="rgba(201,147,58,0)" />
+                  </linearGradient>
+                </defs>
+                <polyline points="0,35 20,28 40,30 60,20 80,24 100,15 120,18 140,10 160,14 180,8 200,12"
+                  fill="none" stroke="rgba(201,147,58,0.7)" strokeWidth="1.5" strokeLinecap="round" />
+                <polyline points="0,35 20,28 40,30 60,20 80,24 100,15 120,18 140,10 160,14 180,8 200,12 200,40 0,40"
+                  fill="url(#goldGrad)" stroke="none" />
+              </svg>
+            </div>
+            <p className="nova-card-desc">Real-time EURUSD price with SMC bias overlay. Session-aware, spread-adjusted.</p>
+          </div>
+
+          {/* Card 2: Watch list */}
+          <div className="nova-card c2">
+            <div className="card-inner-blob" style={{ width: 200, height: 200, background: 'rgba(181,23,90,0.2)', top: -60, right: -60 }} />
+            <div className="nova-card-tag">Watch List</div>
+            <div className="pair-grid">
+              <div className="pair-cell"><div className="pair-name">GBP/USD</div><div className="pair-val up">+0.14%</div></div>
+              <div className="pair-cell"><div className="pair-name">USD/JPY</div><div className="pair-val down">-0.09%</div></div>
+              <div className="pair-cell"><div className="pair-name">XAU/USD</div><div className="pair-val up">+0.44%</div></div>
+              <div className="pair-cell"><div className="pair-name">NAS100</div><div className="pair-val up">+0.61%</div></div>
+            </div>
+          </div>
+
+          {/* Card 3: Session */}
+          <div className="nova-card c3">
+            <div className="card-inner-blob" style={{ width: 180, height: 180, background: 'rgba(26,107,90,0.25)', bottom: -40, left: -40 }} />
+            <div className="nova-card-tag">Session</div>
+            <div className="nova-big-num" style={{ fontSize: 42 }}>NYC</div>
+            <div style={{ marginTop: 10, fontFamily: 'DM Mono, monospace', fontSize: 11, color: 'var(--muted)' }}>Open · 09:30 EST</div>
+            <div style={{ marginTop: 16, display: 'flex', gap: 6 }}>
+              {[1,2,3].map(i => <div key={i} style={{ height: 4, flex: 1, background: 'rgba(74,222,128,0.5)', borderRadius: 2 }} />)}
+              {[4,5].map(i => <div key={i} style={{ height: 4, flex: 1, background: 'var(--border)', borderRadius: 2 }} />)}
+            </div>
+          </div>
+
+          {/* Card 4: Active Signals */}
+          <div className="nova-card c4">
+            <div className="card-inner-blob" style={{ width: 200, height: 200, background: 'rgba(201,147,58,0.15)', top: -50, left: -50 }} />
+            <div className="nova-card-tag">Active Signals</div>
+            <div className="signal-row"><span className="signal-name">BOS · 1H</span><span className="signal-badge badge-long">LONG</span></div>
+            <div className="signal-row"><span className="signal-name">OB · 4H</span><span className="signal-badge badge-short">SHORT</span></div>
+            <div className="signal-row"><span className="signal-name">FVG · 15M</span><span className="signal-badge badge-wait">WAIT</span></div>
+          </div>
+
+          {/* Card 5: Win rate */}
+          <div className="nova-card c3">
+            <div className="card-inner-blob" style={{ width: 200, height: 200, background: 'rgba(181,23,90,0.2)', bottom: -60, right: -60 }} />
+            <div className="nova-card-tag">Win Rate</div>
+            <div className="nova-big-num" style={{ color: 'var(--gold)' }}>68<span className="unit">%</span></div>
+            <p className="nova-card-desc" style={{ fontSize: 11, marginTop: 8 }}>Last 90 days · 312 signals</p>
+          </div>
+
+          {/* Card 6: Monthly PnL */}
+          <div className="nova-card c6">
+            <div className="card-inner-blob" style={{ width: 350, height: 350, background: 'rgba(26,107,90,0.18)', bottom: -100, right: -100 }} />
+            <div className="nova-card-tag">Performance · Monthly PnL</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 8 }}>
+              <div className="nova-big-num" style={{ fontSize: 40, color: '#4ade80' }}>+24.3<span className="unit">%</span></div>
+              <div style={{ fontFamily: 'DM Mono, monospace', fontSize: 11, color: 'var(--muted)' }}>This month</div>
+            </div>
+            <div className="nova-chart-bars">
+              {[
+                { h: '40%', c: 'rgba(74,222,128,0.5)' },
+                { h: '65%', c: 'rgba(74,222,128,0.6)' },
+                { h: '45%', c: 'rgba(248,113,113,0.5)' },
+                { h: '80%', c: 'rgba(74,222,128,0.7)' },
+                { h: '55%', c: 'rgba(74,222,128,0.55)' },
+                { h: '70%', c: 'rgba(74,222,128,0.65)' },
+                { h: '35%', c: 'rgba(248,113,113,0.5)' },
+                { h: '90%', c: 'rgba(201,147,58,0.8)' },
+                { h: '75%', c: 'rgba(74,222,128,0.7)' },
+                { h: '60%', c: 'rgba(74,222,128,0.6)' },
+                { h: '85%', c: 'rgba(74,222,128,0.75)' },
+                { h: '95%', c: 'rgba(201,147,58,0.9)' },
+              ].map((b, i) => (
+                <div key={i} className="nova-bar" style={{ height: b.h, background: b.c }} />
+              ))}
+            </div>
+          </div>
+
+          {/* Card 7: Market Regime */}
+          <div className="nova-card c5">
+            <div className="card-inner-blob" style={{ width: 200, height: 200, background: 'rgba(181,23,90,0.25)', top: -60, right: -60 }} />
+            <div className="nova-card-tag">Market Regime</div>
+            <div style={{ marginTop: 12 }}>
+              <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--nwhite)' }}>Trending</div>
+              <div style={{ fontFamily: 'DM Mono, monospace', fontSize: 10, color: 'var(--gold)', letterSpacing: '0.15em', marginTop: 6 }}>BULLISH · HIGH CONF</div>
+            </div>
+            <div style={{ marginTop: 24, display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontFamily: 'DM Mono, monospace', fontSize: 11 }}>
+                <span style={{ color: 'var(--muted)' }}>Confidence</span><span style={{ color: 'var(--nwhite)' }}>87%</span>
+              </div>
+              <div style={{ height: 3, background: 'var(--border)', borderRadius: 2, overflow: 'hidden' }}>
+                <div style={{ height: '100%', width: '87%', background: 'var(--gold)', borderRadius: 2 }} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── STATS ROW ── */}
+      <div className="nova-stats-row">
+        {[
+          { num: '27',   label: 'SMC Signals',  blob: 'rgba(201,147,58,0.12)',  pos: { top: -80, left: -80 } },
+          { num: '1.96', label: 'Sharpe Ratio', blob: 'rgba(181,23,90,0.12)',   pos: { bottom: -80, right: -40 } },
+          { num: '68%',  label: 'Win Rate',     blob: 'rgba(26,107,90,0.12)',   pos: { top: -60, right: -60 } },
+          { num: '$50K', label: 'Prop Target',  blob: 'rgba(201,147,58,0.1)',   pos: { bottom: -60, left: -40 } },
+        ].map(s => (
+          <div key={s.label} className="nova-stat-cell">
+            <div className="cell-blob" style={{ width: 250, height: 250, background: s.blob, ...s.pos }} />
+            <div className="nova-stat-num">{s.num}</div>
+            <div className="nova-stat-label">{s.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* ── HOW IT WORKS ── */}
+      <section className="nova-section">
+        <div className="blob" style={{ width: 400, height: 400, background: 'rgba(201,147,58,0.12)', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', filter: 'blur(100px)' }} />
+        <div className="nova-section-label">The Process</div>
+        <div className="nova-section-title">How<br /><span className="dim">Nova works.</span></div>
+
+        <div className="nova-steps">
+          <div className="nova-step">
+            <div className="step-blob" style={{ width: 200, height: 200, background: 'rgba(201,147,58,0.15)', bottom: -60, right: -60 }} />
+            <div className="nova-step-num">01 —</div>
+            <h3>Market Structure First</h3>
+            <p>Nova maps BOS, CHoCH, and inducement across all timeframes. Top-down from Daily to 15M. Structure before entry, always.</p>
+          </div>
+          <div className="nova-step">
+            <div className="step-blob" style={{ width: 200, height: 200, background: 'rgba(181,23,90,0.15)', top: -60, left: -60 }} />
+            <div className="nova-step-num">02 —</div>
+            <h3>Confluence Engine</h3>
+            <p>27 SMC/ICT signals scored and ranked in real time. Order blocks, FVGs, liquidity voids — weighted by session and HTF bias.</p>
+          </div>
+          <div className="nova-step">
+            <div className="step-blob" style={{ width: 200, height: 200, background: 'rgba(26,107,90,0.15)', bottom: -60, left: -60 }} />
+            <div className="nova-step-num">03 —</div>
+            <h3>Execute with Precision</h3>
+            <p>Clear entries, SL, and TP. Risk parameters sized for E8 and other prop firm rules. Journal every trade automatically.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* ── FOOTER CTA ── */}
+      <section className="nova-footer-cta">
+        <div className="blob" style={{ width: 500, height: 500, background: 'rgba(181,23,90,0.22)', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', filter: 'blur(80px)' }} />
+        <div className="blob" style={{ width: 300, height: 300, background: 'rgba(201,147,58,0.18)', top: '30%', left: '60%', filter: 'blur(80px)' }} />
+        <h2>
+          Trade smarter.<br /><span className="dim">Not harder.</span>
+        </h2>
+        <div className="nova-cta-row">
+          <input className="nova-footer-input" type="email" placeholder="your@email.com" />
+          <button className="btn-primary" onClick={() => setShowSignIn(true)}>Get Early Access</button>
+        </div>
+      </section>
+
+      {/* ── WORDMARK ── */}
+      <div className="nova-wordmark">Nova</div>
+
+      {/* ── FOOTER ── */}
+      <footer className="nova-footer">
+        <div className="nova-footer-logo">Nova<span>.</span></div>
+        <ul className="nova-footer-links">
+          <li><a href="#">Features</a></li>
+          <li><a href="#">Community</a></li>
+          <li><a href="#">Telegram</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+        <div className="nova-footer-copy">© 2025 Nova · All rights reserved</div>
+      </footer>
+
+      {/* ── SIGN-IN MODAL ── */}
+      {showSignIn && <SignInModal onClose={() => setShowSignIn(false)} />}
+    </div>
+  )
+}
+
+/* ─── Placeholder pages ──────────────────────────────────────────────────── */
 function PlaceholderPage({ title }) {
   return (
     <div className="flex items-center justify-center h-64">
@@ -339,16 +381,13 @@ function PlaceholderPage({ title }) {
   )
 }
 
-/* ─── App shell (authenticated) ─────────────────────────────────────────── */
+/* ─── App shell (post-auth) ──────────────────────────────────────────────── */
 function AppShell() {
   const { authReady, authSession } = useData()
 
   if (!authReady) return (
-    <div
-      className="min-h-screen flex items-center justify-center"
-      style={{ background: 'radial-gradient(ellipse at 65% 45%, #1c093e 0%, #0a0518 55%, #040210 100%)' }}
-    >
-      <div className="w-8 h-8 border-2 border-[#f72585] border-t-transparent rounded-full animate-spin" />
+    <div style={{ minHeight: '100vh', background: '#070707', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: '#c9933a', borderTopColor: 'transparent' }} />
     </div>
   )
 
