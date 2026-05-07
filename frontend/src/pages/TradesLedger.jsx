@@ -106,7 +106,7 @@ export default function TradesLedger() {
             className="w-full bg-[#111] border border-[#1e1e1e] text-gray-300 text-xs rounded-lg pl-8 pr-3 py-2 focus:outline-none focus:border-[#f72585] transition-colors placeholder-gray-600"
           />
         </div>
-        <Dropdown label="Session"   value={session}   onChange={v => { setSession(v);   setPage(0) }} options={['NY', 'LONDON']} />
+        <Dropdown label="Session"   value={session}   onChange={v => { setSession(v);   setPage(0) }} options={['LONDON', 'NY']} />
         <Dropdown label="Direction" value={direction} onChange={v => { setDirection(v); setPage(0) }} options={['BULL', 'BEAR']} />
         <Dropdown label="Result"    value={result}    onChange={v => { setResult(v);    setPage(0) }} options={['WIN', 'LOSS', 'SCRATCH']} />
         <button

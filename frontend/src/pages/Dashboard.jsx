@@ -1,7 +1,7 @@
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine,
 } from 'recharts'
-import { TrendingUp, BarChart2, DollarSign, Target, Plus } from 'lucide-react'
+import { TrendingUp, BarChart2, DollarSign, Target } from 'lucide-react'
 import { useData } from '../context/DataContext'
 import StatCard from '../components/StatCard'
 
@@ -31,8 +31,8 @@ function CustomTooltip({ active, payload, label }) {
     <div className="bg-[#111] border border-[#2a2a2a] rounded-lg px-3 py-2 shadow-xl">
       <p className="text-[10px] text-gray-500 mb-0.5">{fmt.date(label)}</p>
       <p className="text-white font-mono font-bold text-sm">${val.toLocaleString('en-US', { minimumFractionDigits: 2 })}</p>
-      <p className={`text-[10px] font-semibold ${val >= 10000 ? 'text-[#00d68f]' : 'text-[#ff3d71]'}`}>
-        {val >= 10000 ? '+' : ''}{((val - 10000) / 100).toFixed(2)}%
+      <p className={`text-[10px] font-semibold ${val >= 0 ? 'text-[#00d68f]' : 'text-[#ff3d71]'}`}>
+        {val >= 0 ? '+' : ''}{val.toFixed(2)} USD
       </p>
     </div>
   )
@@ -59,7 +59,7 @@ export default function Dashboard() {
       {/* Page header */}
       <div>
         <h1 className="text-2xl font-bold tracking-tight">SYSTEM OVERVIEW</h1>
-        <p className="text-gray-500 text-sm mt-0.5">Real-time backtesting and algorithm execution metrics</p>
+        <p className="text-gray-500 text-sm mt-0.5">Live EURUSD SMC strategy — performance overview</p>
       </div>
 
       {/* Stat cards */}
@@ -80,7 +80,7 @@ export default function Dashboard() {
         <StatCard
           label="Total P&L"
           value={summary ? fmt.usd(summary.totalPnlUsd) : '—'}
-          sub={`${summary ? fmt.pct(summary.totalReturn) : '—'} return`}
+          sub={`${summary ? summary.wins + 'W ' + summary.losses + 'L' : '—'}`}
           icon={DollarSign}
         />
         <StatCard
@@ -95,9 +95,9 @@ export default function Dashboard() {
       <div className="bg-[#0f0f0f] border border-[#1e1e1e] rounded-xl p-5">
         <div className="flex items-center justify-between mb-5">
           <div>
-            <h2 className="font-semibold tracking-wide text-sm uppercase text-gray-300">Equity Performance</h2>
+            <h2 className="font-semibold tracking-wide text-sm uppercase text-gray-300">Equity Curve</h2>
             <p className="text-[11px] text-gray-500 mt-0.5">
-              ${startBal.toLocaleString()} → ${(summary?.finalBalance ?? startBal).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+              Cumulative P&L — {curve.length} data points
             </p>
           </div>
           <span className="text-[#00d68f] text-xs font-semibold bg-[#00d68f]/10 border border-[#00d68f]/20 px-2.5 py-1 rounded-full">
@@ -133,7 +133,7 @@ export default function Dashboard() {
               width={72}
             />
             <Tooltip content={<CustomTooltip />} />
-            <ReferenceLine y={startBal} stroke="#333" strokeDasharray="4 4" />
+            <ReferenceLine y={0} stroke="#333" strokeDasharray="4 4" />
             <Area
               type="monotone"
               dataKey="balance"
@@ -157,7 +157,7 @@ export default function Dashboard() {
           <table className="w-full text-sm">
             <thead>
               <tr className="text-[10px] text-gray-600 uppercase tracking-wider border-b border-[#1a1a1a]">
-                {['Date', 'Session', 'Direction', 'Result', 'Volatility', 'P&L'].map(h => (
+                {['Date', 'Session', 'Direction', 'Result', 'Stop Pips', 'P&L'].map(h => (
                   <th key={h} className="px-5 py-3 text-left font-semibold">{h}</th>
                 ))}
               </tr>
@@ -196,10 +196,6 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* FAB */}
-      <button className="fixed bottom-8 right-8 w-12 h-12 bg-[#f72585] rounded-full flex items-center justify-center shadow-lg glow-pink-strong hover:bg-[#d91e73] transition-colors">
-        <Plus size={20} />
-      </button>
     </div>
   )
 }
